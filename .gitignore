@@ -1,0 +1,18 @@
+# Environment
+.env
+*.env
+
+# Docker
+*.pid
+
+# Python (for FastAPI service)
+__pycache__/
+*.pyc
+.venv/
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
