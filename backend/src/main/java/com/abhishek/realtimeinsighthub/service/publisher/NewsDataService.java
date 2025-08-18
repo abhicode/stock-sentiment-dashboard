@@ -65,16 +65,6 @@ public class NewsDataService implements MarketDataService {
                     String description = (String) article.getOrDefault("description", "");
                     String combinedText = (title + " " + description).trim();
                     combinedTextBuilder.append(combinedText).append(". ");
-
-                    // NewsDataDto newsDataDto = new NewsDataDto(
-                    //        Instant.now(),
-                    //         stock,
-                    //         combinedText
-                    // );
-
-                    // String jsonMessage = objectMapper.writeValueAsString(newsDataDto);
-                    // kafkaTemplate.send(TOPIC, jsonMessage);
-                    // System.out.println("Published News Data: " + newsDataDto);
                 }
                 NewsDataDto newsDataDto = new NewsDataDto(
                     Instant.now(),
