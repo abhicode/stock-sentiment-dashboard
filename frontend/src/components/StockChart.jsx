@@ -59,7 +59,7 @@ export default function StockChart({ stock, mode = "live", range = "1d" }) {
         console.log('WebSocket Connected:', frame);
         setConnectionStatus('Connected');
 
-        stockSubscriptionRef.current = client.subscribe('/topic/stocks', (message) => {
+        stockSubscriptionRef.current = client.subscribe('/topic/stock', (message) => {
           try {
             const stockUpdate = JSON.parse(message.body);
             console.log('Received stock update:', stockUpdate);
