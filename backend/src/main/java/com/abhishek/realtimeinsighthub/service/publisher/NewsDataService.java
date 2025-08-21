@@ -12,7 +12,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.abhishek.realtimeinsighthub.dto.NewsDataDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.netty.channel.ChannelOption;
+import reactor.netty.http.client.HttpClient;
+
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 
 @Service
 public class NewsDataService implements MarketDataService {
@@ -30,7 +34,12 @@ public class NewsDataService implements MarketDataService {
     public NewsDataService(KafkaTemplate<String, String> kafkaTemplate,
         ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
-        this.webClient = WebClient.builder().baseUrl("https://api.tickertick.com").build();
+        this.webClient = WebClient.builder().baseUrl("https://api.tickertick.com")
+            .clientConnector(new ReactorClientHttpConnector(
+                HttpClient.create()
+                    .option(ChannelOption.SO_KEEPALIVE, false)
+                    .keepAlive(false) // do not keep connections alive
+            )).build();
         this.objectMapper = objectMapper;
         this.lastSeen = new ConcurrentHashMap<>();
     }
