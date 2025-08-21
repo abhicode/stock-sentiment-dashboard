@@ -339,7 +339,7 @@ export default function StockChart({ stock, mode = "live", range = "1d" }) {
                 if (!priceSeries || priceSeries.length === 0) {
                   label.text += ' (Points only when news available)';
                 } else {
-                  label.text += ' (price mapped to latest news sentiment)';
+                  label.text += ' (as of last news before price time)';
                 }
               }
             });
