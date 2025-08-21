@@ -27,8 +27,12 @@ public class StockChartService {
     private final SentimentRepo sentimentRepo;
 
     public List<StockChartDto> getChartData(String stock, Duration period) {
-        List<Price> prices = priceRepo.findByStockOrderByTimestampAsc(stock);
-        List<Sentiment> sentiments = sentimentRepo.findByStockOrderByTimestampAsc(stock);
+        List<Price> prices = priceRepo.findByStockAndTimestampAfterOrderByTimestampAsc(stock, period.toMillis() > 0 
+            ? Instant.now().minus(period) 
+            : Instant.EPOCH);
+        List<Sentiment> sentiments = sentimentRepo.findByStockAndTimestampAfterOrderByTimestampAsc(stock, period.toMillis() > 0 
+            ? Instant.now().minus(period) 
+            : Instant.EPOCH);
         
         if (prices.isEmpty() && !sentiments.isEmpty()) {
             return sentiments.stream()

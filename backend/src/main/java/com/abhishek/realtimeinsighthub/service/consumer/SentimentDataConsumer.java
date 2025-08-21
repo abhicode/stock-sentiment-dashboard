@@ -1,10 +1,13 @@
 package com.abhishek.realtimeinsighthub.service.consumer;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,7 +78,7 @@ public class SentimentDataConsumer implements ConsumerService {
         List<NewsDataDto> batch;
         synchronized (lock) {
             if (buffer.isEmpty()) return;
-            batch = new ArrayList<>(buffer);
+            batch = mergeNewsWithEqualTimestamp(new ArrayList<>(buffer));
             buffer.clear();
         }
 
@@ -117,5 +120,22 @@ public class SentimentDataConsumer implements ConsumerService {
         s.setPosScore(response.getScores().getOrDefault("pos", 0.0));
         s.setCompoundScore(response.getScores().getOrDefault("compound", 0.0));
         return s;
+    }
+
+    private static List<NewsDataDto> mergeNewsWithEqualTimestamp(List<NewsDataDto> newsList) {
+        return newsList.stream()
+            .collect(Collectors.groupingBy(
+                n -> Arrays.asList(n.getStock(), n.getTimestamp()), // group key
+                Collectors.mapping(NewsDataDto::getNewsData, Collectors.toList())
+            ))
+            .entrySet()
+            .stream()
+            .map(entry -> new NewsDataDto(
+                    (Instant) entry.getKey().get(1), // timestamp
+                    (String) entry.getKey().get(0), // stock
+                    String.join(" ", 
+                    entry.getValue().stream().map(Object::toString).toList())
+                    ))
+            .toList();
     }
 }

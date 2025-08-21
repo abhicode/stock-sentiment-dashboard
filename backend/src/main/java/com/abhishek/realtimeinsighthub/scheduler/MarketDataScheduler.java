@@ -31,8 +31,8 @@ public class MarketDataScheduler {
         }
     }
 
-    // triggers every 30 minutes
-    @Scheduled(fixedRate = 1800000)
+    // triggers every 10 minutes
+    @Scheduled(fixedRate = 600000)
     public void fetchNewsDataService() {
         services.stream()
             .filter(s -> s instanceof NewsDataService)
