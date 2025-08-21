@@ -142,14 +142,19 @@ export default function StockChart({ stock, mode = "live", range = "1d" }) {
                   return updated;
                 } else {
                   // append new point
-                  return [
+                  const updated =  [
                     ...prev,
                     { 
                       x: new Date(sentimentUpdate.timestamp), 
                       y: sentimentUpdate.compound,
                       sentiment: sentimentUpdate.sentiment
                     }
-                  ].slice(-100);
+                  ];
+                  
+                  // sort by timestamp to keep chart consistent
+                  updated.sort((a, b) => new Date(a.x) - new Date(b.x));
+
+                  return updated.slice(-100);
                 }
               });
             }
