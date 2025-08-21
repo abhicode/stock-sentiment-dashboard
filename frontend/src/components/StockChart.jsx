@@ -420,29 +420,28 @@ export default function StockChart({ stock, mode = "live", range = "1d" }) {
               ● {connectionStatus}
             </div>
           )}
-
-          {priceSeries.length > 0 && (
-            <div>
+          <div>
+            {priceSeries.length > 0 && (
               <div>
                 Price: ${priceSeries[priceSeries.length - 1].y}
               </div>
-              {sentimentSeries.length > 0 && (
-                <div
-                  style={{
-                    color:
-                      sentimentSeries[sentimentSeries.length - 1].sentiment === "positive"
-                        ? "green"
-                        : sentimentSeries[sentimentSeries.length - 1].sentiment === "negative"
-                        ? "red"
-                        : "gray",
-                  }}
-                >
-                  Sentiment: {sentimentSeries[sentimentSeries.length - 1].sentiment} (
-                  {sentimentSeries[sentimentSeries.length - 1].y?.toFixed(2)})
-                </div>
-              )}
-            </div>
-          )}
+            )}
+            {sentimentSeries.length > 0 && (
+              <div
+                style={{
+                  color:
+                    sentimentSeries[sentimentSeries.length - 1].sentiment === "positive"
+                      ? "green"
+                      : sentimentSeries[sentimentSeries.length - 1].sentiment === "negative"
+                      ? "red"
+                      : "gray",
+                }}
+              >
+                Sentiment: {sentimentSeries[sentimentSeries.length - 1].sentiment} (
+                {sentimentSeries[sentimentSeries.length - 1].y?.toFixed(2)})
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
