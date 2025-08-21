@@ -44,7 +44,7 @@ public class NewsDataService implements MarketDataService {
                         .uri(uriBuilder -> uriBuilder
                                 .path("/feed")
                                 .queryParam("q", String.format("tt:%s", stock.toLowerCase()))
-                                .queryParam("n", 10)
+                                .queryParam("n", 5)
                                 .build())
                         .retrieve()
                         .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
