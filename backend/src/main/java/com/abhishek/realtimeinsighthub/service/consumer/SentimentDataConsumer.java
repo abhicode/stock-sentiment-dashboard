@@ -37,8 +37,8 @@ public class SentimentDataConsumer implements ConsumerService {
 
     private final List<NewsDataDto> buffer = new ArrayList<>();
     private final Object lock = new Object();
-    private final int BATCH_SIZE = 10;
-    private final Duration FLUSH_INTERVAL = Duration.ofSeconds(5);
+    private final int BATCH_SIZE = 5;
+    private final Duration FLUSH_INTERVAL = Duration.ofSeconds(2);
 
     private final WebClient webClient;
 
@@ -69,7 +69,7 @@ public class SentimentDataConsumer implements ConsumerService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to process sentiment message: " + e.getMessage());
+            System.err.println("Failed to consume news data from Kafka: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -92,6 +92,13 @@ public class SentimentDataConsumer implements ConsumerService {
 
             List<Sentiment> entities = results.stream()
                 .map(this::mapResponseToEntity)
+                .collect(Collectors.toMap(
+                    e -> e.getStock() + "_" + e.getTimestamp(), 
+                    e -> e,
+                    (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
                 .toList();
 
             sentimentRepo.saveAll(entities);
@@ -104,9 +111,10 @@ public class SentimentDataConsumer implements ConsumerService {
                     sentimentEntity.getCompoundScore()
                 );
                 webSocketController.sendSentimentUpdate(sentimentData);
+                System.out.println("Sentiment data published: " + sentimentData);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Failed to process news sentiment " + e.getMessage());
         }
     }
 

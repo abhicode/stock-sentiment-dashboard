@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.abhishek.realtimeinsighthub.dto.NewsDataDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.RateLimiter;
 
 import io.netty.channel.ChannelOption;
 import reactor.netty.http.client.HttpClient;
@@ -31,6 +32,8 @@ public class NewsDataService implements MarketDataService {
 
     private final Map<String, Instant> lastSeen ;
 
+    private final RateLimiter rateLimiter;
+
     public NewsDataService(KafkaTemplate<String, String> kafkaTemplate,
         ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
@@ -42,13 +45,14 @@ public class NewsDataService implements MarketDataService {
             )).build();
         this.objectMapper = objectMapper;
         this.lastSeen = new ConcurrentHashMap<>();
+        this.rateLimiter = RateLimiter.create(10);
     }
 
     @Override
     public void fetchAndPublishData() {
         for (String stock : STOCKS) {
             try {
-
+                rateLimiter.acquire();
                 Map<String, Object> newsData = webClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/feed")
@@ -125,6 +129,8 @@ public class NewsDataService implements MarketDataService {
                         kafkaTemplate.send(TOPIC, objectMapper.writeValueAsString(dto));
                         System.out.println("Published News Data: " + dto);
                     }
+                } else {
+                    System.out.println("No new articles for: " + stock);
                 }
             } catch (Exception e) {
                 System.err.println("Error fetching news data for " + stock + ": " + e.getMessage());
